@@ -67,6 +67,7 @@ class DataModules(object):
         """
         modobj = None
 
+        # first look for platform specific data collect module
         for ospath in self.os_search_path:
             try:
                 modparent = __import__(
@@ -74,9 +75,26 @@ class DataModules(object):
                     globals(),
                     locals(),
                     [module],
-               )
+                )
                 modobj = getattr(modparent, module)
                 break
+            except AttributeError:
+                pass
+            except ImportError:
+                pass
+
+        if modobj is None:
+            # No platform specific module, look for generic module
+            try:
+                modparent = __import__(
+                    '.'.join(['boristool', 'arch', 'generic']),
+                    globals(),
+                    locals(),
+                    [module],
+                )
+                modobj = getattr(modparent, module)
+            except AttributeError:
+                pass
             except ImportError:
                 pass
 

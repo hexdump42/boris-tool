@@ -424,6 +424,22 @@ def sendmail_smtp(headers, body):
 WORKDIR = None
 
 
+def notify(subject, body):
+    """Use platform specific desktop notification system.
+
+    Currently only OSX notifications supported and this is dependant on pync
+    module being installed https://github.com/SeTeM/pync
+    """
+    try:
+        import pync
+        use_pync = True
+    except:
+        use_pync = False
+
+    if use_pync:
+        pync.Notifier.notify(body, title=subject)
+
+
 def get_work_dir():
     """Return the temporary working directory as a string.  This is the
     directory location set by WORKDIR in boris.cf.  If this is not defined

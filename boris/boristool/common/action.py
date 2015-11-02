@@ -48,7 +48,7 @@ class action:
             message = message.subject
 
         # Substitute variables in message string
-        message = utils.parseVars(message, self.varDict)
+        message = utils.parse_vars(message, self.varDict)
 
         for via in vias.split(';'):
 
@@ -173,10 +173,10 @@ class action:
                 self.varDict['problemage'] = agestr
             self.varDict['problemfirstdetect'] = "First detected: %04d/%02d/%02d %d:%02d:%02d" % (t[0], t[1], t[2], t[3], t[4], t[5])
 
-        # run thru utils.parseVars() to substitute variables from varDict
-        address = utils.parseVars(address, self.varDict)
-        subj = utils.parseVars(subj, self.varDict)
-        body = utils.parseVars(body, self.varDict)
+        # run thru utils.parse_vars() to substitute variables from varDict
+        address = utils.parse_vars(address, self.varDict)
+        subj = utils.parse_vars(subj, self.varDict)
+        body = utils.parse_vars(body, self.varDict)
 
         headers = 'To: %s\nSubject: [%s] %s\n' % (address,log.hostname,subj)
         r = utils.sendmail(headers, body)
@@ -196,7 +196,7 @@ class action:
         """
 
         # Substitute variables in string
-        cmd = utils.parseVars(cmd, self.varDict)
+        cmd = utils.parse_vars(cmd, self.varDict)
 
         if len(cmd) == 0:
             log.log("<action>action.system(): Error, no command given", 5)
@@ -228,7 +228,7 @@ class action:
         # is not executed.
 
         # Substitute variables in string
-        cmd = utils.parseVars(cmd, self.varDict)
+        cmd = utils.parse_vars(cmd, self.varDict)
 
         # Security: if cmd contains any illegal characters, "/#;!$%&*|~`", then we abort.
         if utils.charpresent(cmd, '/#;!$%&*|~`') != 0:
@@ -357,7 +357,7 @@ class action:
             loglevel = log.loglevel_min
 
         # Parse the text string to replace variables
-        logstr = utils.parseVars(logstr, self.varDict)
+        logstr = utils.parse_vars(logstr, self.varDict)
 
         # Log the text
         retval = log.log(logstr, loglevel)
@@ -400,7 +400,7 @@ class action:
             return
 
         # Substitute variables in string
-        body = utils.parseVars(body, self.varDict)
+        body = utils.parse_vars(body, self.varDict)
 
         retval = elvin.Ticker(body, timeout)
 
@@ -434,7 +434,7 @@ class action:
             # if nothing passed in data storedict will be used
             retval = elvin.elvindb(table, self.storedict)
         else:
-            data = utils.parseVars(data, self.varDict)        # substitute variables
+            data = utils.parse_vars(data, self.varDict)        # substitute variables
             datas = data.split(',')                # separate key/val pairs
             storedict = {}
             for d in datas:
@@ -481,7 +481,7 @@ class action:
         datadict = {}
         datadict['hostname']=log.hostname
         datadict['desc']=desc
-        datadict['output']=utils.parseVars(output, self.varDict)
+        datadict['output']=utils.parse_vars(output, self.varDict)
         datadict['return']=retcode
 
         retval = elvin.netsaint(datadict)

@@ -410,7 +410,7 @@ class Directive:
             pass
         else:
             # convert scanperiod to integer seconds if not already
-            if isinstance(self.args.scanperiod, int):
+            if not isinstance(self.args.scanperiod, int):
                 self.args.scanperiod = utils.val2secs(self.args.scanperiod)
                 if self.args.scanperiod is None:
                     raise ParseFailure("Invalid scanperiod: '%s'"
@@ -625,7 +625,7 @@ class Directive:
                     for aa in aList:
                         self.evalAction(aa)
 
-    def doAction(self, Config, actionList=None):
+    def doAction(self, cfg, actionList=None):
         """Perform actions for a directive."""
 
         if self.state.checkcount < self.args.numchecks:
@@ -671,7 +671,7 @@ class Directive:
         # (they are not always necessary)
         if 'actionList' in dir(self.args):
             self.performedactions = 1     # flag that actions have been called
-            self.performAction(Config, self.args.actionList)
+            self.performAction(cfg, self.args.actionList)
 
     def parseAction(self, toklist):
         """Parses token list and returns a list of action call strings."""
@@ -773,8 +773,8 @@ class Directive:
         self.Action.varDict.update(data)
         self.addVariables()
 
-        if result == 0:
-            self.state.stateok(Config)        # update state info for check passed
+        if result is False:
+            self.state.stateok(cfg)        # update state info for check passed
 
         else:
             self.state.statefail()        # update state info for check failed
@@ -825,7 +825,7 @@ class Directive:
         self.last_check_time = time.localtime(time.time())        # note time of last check
 
         try:
-            self.docheck(Config)
+            self.docheck(cfg)
         except:
             e = sys.exc_info()
             tb = traceback.format_list(traceback.extract_tb(e[2]))
@@ -836,7 +836,7 @@ class Directive:
         log.log("<directive>Directive.safeCheck(): ID '%s', self.docheck() returned successfully"
                 % (self.state.ID), 7)
 
-    def docheck(self, Config):
+    def docheck(self, cfg):
         """
         Common Directive method to start executing the directive-specific check
         (or directive function, which may not necessarily "check" something)
@@ -899,7 +899,7 @@ class Directive:
         if failed_deps:
             log.log("<directive>Directive.docheck(): dependencies %s failed, %s not checking"
                     % (failed_deps, self.ID), 7)
-            self.putInQueue(Config.q)        # put self back in the Queue
+            self.putInQueue(cfg.q)        # put self back in the Queue
             return
 
         # If this is the second or subsequent check of a re-check, refresh the data
@@ -919,7 +919,7 @@ class Directive:
                     % (self.ID, err), 4)
             return
 
-        self.doDirective(Config, data)
+        self.doDirective(cfg, data)
 
     def addVariables(self):
         """

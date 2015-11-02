@@ -8,9 +8,7 @@ from . import utils
 
 # Logfile & Log level (defaults)
 logfile = "/var/log/boris.log"
-logfile = "/tmp/boris.log" #MJR
 loglevel = 2
-loglevel = 9 #MJR
 hostname = None                # normally overwritten during startup
 
 adminemail = 'root'

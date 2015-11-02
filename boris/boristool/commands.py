@@ -149,11 +149,9 @@ def scheduler(q, cfg, die_event):
         # we have spare threads so get next checking object
         while not die_event.isSet():
             (c, t) = q.head(block=1)        # wait for next object from queue
-            print("<boris>scheduler(): waiting object is %s at %s" % (c, t)) #MJR
             log.log("<boris>scheduler(): waiting object is %s at %s" %
                     (c, t), 9)
             if t <= time.time():
-                print("<boris>scheduler(): object %s,%s is ready to run" % (c, t)) #MJR
                 log.log("<boris>scheduler(): object %s,%s is ready to run" %
                         (c, t), 9)
                 break
@@ -175,11 +173,9 @@ def scheduler(q, cfg, die_event):
         if c.args.numchecks > 0:
             # start check in a new thread
             thr = threading.Thread(group=None, target=c.safeCheck, name="%s" %
-                                   (c), args=(boris_cfg,), kwargs={})
+                                   (c), args=(cfg,), kwargs={})
             log.log("<boris>scheduler(): Starting new thread for %s, %s" %
                     (c, thr), 8)
-            print("<boris>scheduler(): Starting new thread for %s, %s" %
-                    (c, thr)) #MJR
             thr.setDaemon(1)        # mark thread as Daemon-thread so BORIS will not block when trying to terminate
                                     # with still-running threads.
             thr.start()             # new thread starts running

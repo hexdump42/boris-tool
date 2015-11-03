@@ -7,7 +7,13 @@ import sys
 import smtplib
 import subprocess
 
-from . import log
+from .. _compat import PY3
+if PY3:
+    from . import log
+    from subprocess import getstatusoutput
+else:
+    import log
+    from commands import getstatusoutput
 
 
 # Exceptions
@@ -267,7 +273,7 @@ def safe_getstatusoutput(cmd):
 
     systemcall_semaphore.acquire()
     try:
-        (r, output) = subprocess.getstatusoutput(cmd)
+        (r, output) = getstatusoutput(cmd)
     except Exception as e:
         # if getstatusoutput() raises an exception we must release the
         # semaphore lock before continuing, otherwise all further calls block -

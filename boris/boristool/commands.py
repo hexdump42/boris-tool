@@ -15,13 +15,14 @@ import re
 import threading
 import platform
 
+from .common import parseconfig
+from .common import directive
 from .common import config
 from .common import log
 from .common import timequeue
 from .common import sockets
-from .common import parseconfig
-from .common import directive
 from .common import datacollect
+from .common import utils
 
 # Determine system type
 osname = platform.uname()[0]

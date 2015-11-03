@@ -36,7 +36,7 @@ class TemplateDirective(Exception):
 
 
 # Directive management objects
-class State:
+class State(object):
     """
     Object to track the state of a directive.
     """
@@ -163,7 +163,7 @@ class State:
         return tdiff
 
 
-class Args:
+class Args(object):
     """Container for holding directive arguments."""
 
     def __init__(self):
@@ -171,7 +171,7 @@ class Args:
         pass
 
 
-class Directive:
+class Directive(object):
     """
     The base directive class.  All directives are derived from this base class.
     """

@@ -309,7 +309,10 @@ def sendmail(headers, body):
 
     Returns >=1 on success; 0 on failure.
     """
-    exec("r = %s(headers, body)" % (SENDMAIL_FUNCTION,))
+    if SENDMAIL_FUNCTION == 'sendmail_bin':
+        r = sendmail_bin(headers, body)
+    else:
+        r = sendmail_smtp(headers, body)
     return r
 
 
@@ -520,6 +523,40 @@ def parse_vars(text, var_dict):
             return text
 
     return text
+
+
+def byte_convertor(n):
+    """
+    Convert bytes value to Kilo, Mega etc
+    >>> byte_convertor(10000)
+    '9.8 K'
+    >>> byte_convertor(100001221)
+    '95.4 M'
+
+    1 Kilobyte = 1,024 Bytes
+    1 Megabyte = 1,048,576 Bytes
+    1 Gigabyte = 1,073,741,824 Bytes
+    1 Terabyte = 1,099,511,627,776 Bytes
+    """
+    symbols = ('K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y')
+    prefix = {}
+    for i, s in enumerate(symbols):
+        prefix[s] = 1 << (i + 1) * 10
+    for s in reversed(symbols):
+        if n >= prefix[s]:
+            value = float(n) / prefix[s]
+            return '%.2f %s' % (value, s)
+    return '%.2f B' % (n)
+
+
+def format_with_commas(amount):
+    """
+    Add commas to float string
+    """
+    amount = str(amount)
+    amount = amount[::-1]
+    amount = re.sub(r"(\d\d\d)(?=\d)(?!\d*\.)", r"\1,", amount)
+    return amount[::-1]
 
 
 def create_child(do_stds):

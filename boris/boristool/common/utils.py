@@ -12,7 +12,7 @@ if PY3:
     from . import log
     from subprocess import getstatusoutput
 else:
-    import log
+    from . import log
     from commands import getstatusoutput
 
 
@@ -545,8 +545,8 @@ def byte_convertor(n):
     for s in reversed(symbols):
         if n >= prefix[s]:
             value = float(n) / prefix[s]
-            return '%.2f %s' % (value, s)
-    return '%.2f B' % (n)
+            return '%.1f %s' % (value, s)
+    return '%.1f B' % (n)
 
 
 def format_with_commas(amount):

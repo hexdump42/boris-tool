@@ -71,7 +71,8 @@ class system(datacollect.DataCollect):
         if uptime_dict:
             self.data.datahash.update(uptime_dict)
 
-        log.log("<system>system.collectData(): collected data for %d system statistics" % (len(self.data.datahash.keys())), 6)
+        log.log("<system>system.collectData(): collected data for %d system statistics" %
+                (len(self.data.datahash.keys())), 6)
 
     def _getvmstat(self):
         """Get system virtual memory statistics from the 'vm_stat' command.

@@ -189,7 +189,7 @@ class action:
                     (address,subj,body[:20]), 4)
 
     def notify(self, subject="", body=""):
-        """Use the platform specific desktop tion system
+        """Use the platform specific desktop notification system
 
         subject should be either a standard string which will be used as the
         notification subject or a MSG object.

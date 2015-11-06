@@ -7,13 +7,14 @@ import sys
 import smtplib
 import subprocess
 
-from .. _compat import PY3
-if PY3:
-    from . import log
-    from subprocess import getstatusoutput
+from .. _compat import PY2
+
+if PY2:
+    import log
+    from commands import getstatusoutput
 else:
     from . import log
-    from commands import getstatusoutput
+    from subprocess import getstatusoutput
 
 
 # Exceptions

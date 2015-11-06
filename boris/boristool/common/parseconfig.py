@@ -11,7 +11,7 @@ from . import config
 from . import log
 from . import utils
 from .directive import TemplateDirective
-from .. _compat import PY3
+from .. _compat import PY2
 
 
 # Exceptions
@@ -360,12 +360,12 @@ def readFile(file, state):
     # state.tokeneater() which will parse the tokens and create something
     # meaningful.
     try:
-        if PY3:
+        if PY2:
+            tokenize.tokenize(conf.readline, state.tokeneater)
+        else:
             tg = tokenize.tokenize(conf.readline)
             for toknum, tokval, tokstart, tokend, nt in tg:
                 state.tokeneater(toknum, tokval, tokstart, tokend, nt)
-        else:
-            tokenize.tokenize(conf.readline, state.tokeneater)
     except tokenize.TokenError as msg:
         raise config.ParseFailure("Syntax error, %s" % (msg))
 

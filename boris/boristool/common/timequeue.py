@@ -1,9 +1,9 @@
 from .._compat import *
 
-if PY3:
-    import queue
-else:
+if PY2:
     import Queue as queue
+else:
+    import queue
 
 
 __doc__ = '''Queue-derived queue ordering objects by next-run time.

@@ -26,6 +26,18 @@ class ParseVarsTest(unittest.TestCase):
         self.assertEqual(utils.parse_vars("%(z)s", d),
                          "y is 'x is 'some string''")
 
+    def test_single_var_str_format_sub(self):
+        d = {}
+        d['rbytes'] = 100000
+        self.assertEqual(utils.parse_vars("rbytes={rbytes:fmt.bc}", d), "rbytes=97.7 K")
+
+    def test_mix_str_and_format_sub(self):
+        d = {}
+        d['device'] = 'disk0'
+        d['rbytes'] = 100000
+        d['wbytes'] = 200000
+        self.assertEqual(utils.parse_vars("{device} rbytes={rbytes:fmt.bc}, wbytes=%(wbytes)s", d), "disk0 rbytes=97.7 K, wbytes=200000")
+
 
 class ByteConvertorTest(unittest.TestCase):
 

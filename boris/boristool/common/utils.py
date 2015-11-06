@@ -509,6 +509,9 @@ def parse_vars(text, var_dict):
       parse_vars("%(z)s", d) => "y is '%(y)s'" => "y is 'x is '%(x)s''" => "y is 'x is 'some string''"
     """
 
+    # format & substitute variables using str.format with custom formatter
+    if text.find('{') >= 0:
+        text = TextTemplate().format(text, **var_dict)
     # Keep parsing the text string until there are no '%(', or we've done a few parses...
     parses = 0
     while (parses == 0 or text.find('%(') >= 0) and parses < 5:
@@ -523,6 +526,18 @@ def parse_vars(text, var_dict):
             return text
 
     return text
+
+
+class TextTemplate(string.Formatter):
+    """
+    Template that supports custom str formats
+    """
+    def format_field(self, value, spec):
+        if spec.startswith('fmt.'):
+            if spec.startswith('fmt.bc'):
+                value = byte_convertor(value)
+                spec = 's'
+        return super(TextTemplate, self).format_field(value, spec)
 
 
 def byte_convertor(n):

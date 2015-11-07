@@ -14,6 +14,7 @@ import signal
 import re
 import threading
 import platform
+import argparse
 
 from .common import parseconfig
 from .common import directive
@@ -210,10 +211,32 @@ def build_check_queue(q, cfg):
     shorthostname = shorthostname.replace('-', '_')
 
 
+def do_args():
+    """Parse command-line arguments"""
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('config_file', metavar='FILE',
+                        default=None,
+                        help='Load config from FILE')
+    parser.add_argument('--showconfig', action='store_true',
+                        help='Dump config')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Enable verbose output')
+    parser.add_argument('-d', '--daemon', action='store_true',
+                        help='Run as a daemon')
+    parser.add_argument('-S', '--startup-delay', metavar='SECONDS', type=int,
+                        help='Number of SECONDS to pause at startup before monitoring rule execution commences')
+    options = parser.parse_args()
+
+    return options
+
+
 def main():
     """Startup routine - setup and then start the main loop
     """
 
+    options = do_args()
+    config_file = options.config_file
     log.version = __version__
 
     # Catch the most important signals
@@ -224,8 +247,6 @@ def main():
     log.hostname = platform.node()
     buildstr = 'Unknown'
 
-    # ToDo Handle configs
-    config_file = 'boris.cf'
     boris_cfg = config.Config('__main__')
 
     # data_modules handles access to all data collector modules
@@ -239,6 +260,28 @@ def main():
     log.log("<boris>main(): BORIS %s%s, systype: %s" % (__version__, buildstr, systype), 5)
     log.log("<boris>main(): Python version: %s" % (sys.version), 5)
     log.log("<boris>main(): oslibdirs: %s" % (data_modules.os_search_path), 8)
+
+    if options.showconfig:
+        # Just display configuration & exit
+        print('-- Displaying BORIS configuration --')
+        print(boris_cfg)
+        boris_exit()
+
+    if options.startup_delay:
+        delay = options.startup_delay
+        if delay > 0:
+            log.log("<boris>main(): pausing %d seconds before executing rules" %
+                    delay, 5)
+            time.sleep(delay)
+
+    if options.daemon:
+        # Create a child process, then have the parent exit
+        cpid = utils.create_child(True)
+        if cpid != 0:
+            log.log("<boris>main(): Created child process %d. Parent exiting..." %
+                    (cpid,), 6)
+            # don't call boris_exit(), because its still running (as a daemon)
+            sys.exit(0)
 
     # Main Loop
     # Initialise check queue

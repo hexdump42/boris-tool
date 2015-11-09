@@ -3,6 +3,7 @@ import re
 import string
 import threading
 import os
+import io
 import sys
 import smtplib
 import subprocess
@@ -604,13 +605,33 @@ def create_child(do_stds):
         os.close(0)  # stdin
         os.close(1)  # stdout
         os.close(2)  # stderr
-        nulld = '/dev/null'
-        if (hasattr(os, 'devnull')):
-            nulld = os.devnull
-        # This call to open is guaranteed to return the lowest file descriptor,
-        # which will be 0 (stdin), since it was closed above.
-        sys.stdin = open(nulld, 'r')
-        sys.stdout = open(nulld, 'a+')
-        sys.stderr = open(nulld, 'a+', 0)
+        redirect_stream(sys.stdin, None)
+        redirect_stream(sys.stdout, None)
+        redirect_stream(sys.stderr, None)
 
     return 0  # child gets "0" returned
+
+
+def redirect_stream(system_stream, target_stream):
+    """ Redirect a system stream to a specified file.
+
+        :param standard_stream: A file object representing a standard I/O
+            stream.
+        :param target_stream: The target file object for the redirected
+            stream, or ``None`` to specify the null device.
+        :return: ``None``.
+
+        `system_stream` is a standard system stream such as
+        ``sys.stdout``. `target_stream` is an open file object that
+        should replace the corresponding system stream object.
+
+        If `target_stream` is ``None``, defaults to opening the
+        operating system's null device and using its file descriptor.
+
+        Code from python-daemon, an implementation of PEP 3143.
+        """
+    if target_stream is None:
+        target_fd = os.open(os.devnull, os.O_RDWR)
+    else:
+        target_fd = target_stream.fileno()
+    os.dup2(target_fd, system_stream.fileno())

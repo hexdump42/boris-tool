@@ -133,6 +133,14 @@ class Config:
         else:
             return
 
+    def set_spread(self, spread):
+        """Store the Spread connection object, and pass through to other
+        objects which need it (e.g., action module)."""
+
+        self.spread = spread
+        import action
+        action.spread = spread
+
     def checkfiles(self):
         """Check if any of the config or rules files have been modified."""
 

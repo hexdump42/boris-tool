@@ -10,6 +10,7 @@ import time
 
 from . import log
 from . import utils
+from . import borisspread
 
 
 # Globals
@@ -22,6 +23,11 @@ try:
 except ImportError:
     UseSyslog = False
 
+
+# define exceptions
+class SpreadRRDFailure(Exception):
+    """SpreadRRDFailure: a problem occured when trying to send data to Spread RRD
+    listener."""
 
 # DEFINE ALL THE ACTIONS AVAILABLE
 
@@ -486,17 +492,22 @@ class action:
         self.email(pager, msg)
 
     def elvindb(self, table, data=None):
-        """Send information to remote database listener via Elvin.
+        """Send information to remote database listener via Spread.
+        Elvin no longer supported, uses spreaddb instead."""
+        self.spreaddb(table, data)
+
+    def spreaddb(self, table, data=None):
+        """Send information to remote database listener via Spread.
            Data to insert in db can be specified in the data argument as
            'col1=data1, col2=data2, col3=data3' or if data is None it will
            use self.storedict
         """
 
-        log.log("<action>action.elvindb(table='%s' data='%s')"%
+        log.log("<action>action.spreaddb(table='%s' data='%s')"%
                 (table, data), 6)
 
-        if borisElvin4.UseElvin == 0:
-            log.log("<action>action.elvindb(): Elvin is not available - skipping.", 5)
+        if not borisspread.use_spread:
+            log.log("<action>action.spreaddb(): Spread is not available - skipping.", 5)
             return 0
 
         if data is None:
@@ -526,14 +537,71 @@ class action:
 
         # Alert if return value != 0
         if retval != 0:
-            log.log("<action>action.elvindb('%s', dict): Alert, return value for e.send() is %d" %
+            log.log("<action>action.spreaddb('%s', dict): Alert, return value for e.send() is %d" %
                     (table,retval), 5)
         else:
-            log.log("<action>action.elvindb('%s', dict): completed" % (table), 6)
+            log.log("<action>action.spreaddb('%s', dict): completed" % (table), 6)
+
+    def elvinrrd(self, key, data):
+        """Send information to remote RRDtool database listener via Elvin
+        Elvin is no longer supported, so uses spreadrrd instead"""
+        self.spreadrrd(key, data)
+
+    def spreadrrd(self, key, *data):
+        """Send information to remote RRDtool database listener via Spread.
+           key is the RRD name configured in the spread consumer to store the data.
+               data is a variable length list of strings of the form 'var=data'
+            where var is the RRD variable name and data is the data to store.
+               Example use in a directive:
+            SYS loadavg1_rrd:
+                    rule='True'        # always execute
+                    scanperiod='1m'
+                    action="spreadrrd('loadavg1-%(h)s', 'loadavg1=%(sysloadavg1)f')"
+        """
+
+        log.log("<action>action.spreadrrd( key='%s' data='%s' )" %
+                (key, data), 6)
+
+        sendrrd = None
+        if borisspread.use_spread:
+            sendrrd = spread.rrd
+
+        if sendrrd is None:
+            log.log("<action>action.spreadrrd(): No messaging system available - skipping.", 5)
+            return 0
+
+        if len(data) == 0:
+            log.log("<action>action.spreadrrd(): No data supplied.", 5)
+            raise SpreadRRDFailure("no data supplied")
+
+        datadict = {}
+        for d in data:
+            (var, val) = string.split(d, '=')
+            if var is None or var == '' or val is None:
+                msg = "data error: var='%s' val='%s'" % (var,val)
+                log.log("<action>action.spreadrrd(): %s." % msg, 5)
+                raise SpreadRRDFailure(msg)
+            var = utils.parse_vars(var, self.varDict)        # substitute variables
+            val = utils.parse_vars(val, self.varDict)        # substitute variables
+            datadict[var] = val
+
+        key = utils.parse_vars(key, self.varDict)        # substitute variables
+
+        log.log("<action>action.spreadrrd() sending: key='%s' data=%s" %
+                (key, datadict), 6)
+        retval = sendrrd(key, datadict)
+
+        # Alert if return value != 0
+        if retval != 0:
+            log.log("<action>action.spreadrrd(%s, %s), Alert, return value for e.send() is %d" %
+                    (key, datadict, retval), 5)
+        else:
+            log.log("<action>action.spreadrrd(%s, %s): completed" %
+                    (key, datadict), 6)
 
     def netsaint(self, desc, output, retcode):
         """
-        Send information to remote netsaint server via Elvin.
+        Send information to remote netsaint server via Spread.
         Usage:
             action=netsaint("EddieFS", "Disk / at %(fscapac)s percent", 1)
 
@@ -543,8 +611,8 @@ class action:
         log.log("<action>action.netsaint(desc='%s', output='%s', retcode=%s)" %
                 (desc,output,retcode), 8)
 
-        if borisElvin4.UseElvin == 0:
-            log.log("<action>action.netsaint(), Elvin is not available - skipping.", 8)
+        if not borisspread.use_spread:
+            log.log("<action>action.netsaint(), Spread is not available - skipping.", 8)
             return 0
 
         datadict = {}

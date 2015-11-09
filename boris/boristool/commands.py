@@ -24,6 +24,7 @@ from .common import timequeue
 from .common import sockets
 from .common import datacollect
 from .common import utils
+from .common import borisspread
 
 # Determine system type
 osname = platform.uname()[0]
@@ -282,6 +283,17 @@ def main():
                     (cpid,), 6)
             # don't call boris_exit(), because its still running (as a daemon)
             sys.exit(0)
+
+    # Initialise Spread connection and thread to handle Spread messaging
+    try:
+        spread = borisspread.Spread()
+    except borisspread.SpreadInitError as details:
+        log.log( "<boris>main(): Spread init failed, %s, Spread functionality will be disabled." %
+                (details), 5 )
+        spread = None
+    else:
+        spread.startup()                # Start up the Spread management thread
+    boris_cfg.set_spread(spread)
 
     # Main Loop
     # Initialise check queue

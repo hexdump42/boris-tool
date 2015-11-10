@@ -161,7 +161,7 @@ class Spread(object):
 
             try:
                 self.connection = spread.connect(self.server, '', 0, 0)
-            except spread.errorw as msg:
+            except spread.error as msg:
                 log.log("<borisSpread>Spread.connect(): Spread could not connect, '%s'. Waiting %d secs for retry" %
                         (msg, waittime), 5)
                 time.sleep(waittime)

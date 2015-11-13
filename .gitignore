@@ -61,3 +61,6 @@ target/
 
 # Komodo project
 *.komodoproject
+
+# OSX 
+.DS_Store

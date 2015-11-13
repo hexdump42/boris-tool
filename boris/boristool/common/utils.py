@@ -449,6 +449,9 @@ def notify(subject, body):
 
     if use_pync:
         pync.Notifier.notify(body, title=subject)
+        return True
+
+    return False
 
 
 def get_work_dir():

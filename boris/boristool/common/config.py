@@ -138,7 +138,7 @@ class Config:
         objects which need it (e.g., action module)."""
 
         self.spread = spread
-        import action
+        from . import action
         action.spread = spread
 
     def checkfiles(self):

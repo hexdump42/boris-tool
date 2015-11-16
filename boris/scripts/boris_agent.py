@@ -2,5 +2,10 @@
 
 from boristool.commands import agent
 
-if __name__ == '__main__':
+
+def main(*args, **kwargs):
     agent()
+
+
+if __name__ == '__main__':
+    main()

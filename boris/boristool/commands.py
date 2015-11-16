@@ -326,7 +326,6 @@ def main():
 
 
 def agent():
-    main()
     try:
         main()
     except:

@@ -1,0 +1,163 @@
+# Boris Global Config File
+#
+
+# LOGFILE
+#  Specifies the file that Boris logs to.  Log detail is defined by
+#  LOGLEVEL.  LOGFILE should always be defined first.
+#  Use: LOGFILE="<filename>"
+
+LOGFILE="/var/log/boris.log"
+
+
+# LOGLEVEL
+#  LOGLEVEL specifies how much detail is logged to the file
+#  specified by LOGFILE.  The value should be between 0 and
+#  9.  The higher the value, the more detail is logged.  Set
+#  to 0 to not log anything.
+#  Use: LOGLEVEL=<int 0-9>
+
+LOGLEVEL=6
+
+
+# ADMIN
+#  Specifies an email address for logs to be emailed to.  The level
+#  of detail is defined by ADMINLEVEL.  The frequency of emails is
+#  defined by ADMIN_NOTIFY.
+#  Use: ADMIN="<email address>"
+
+ADMIN="boris-adm@domain.name"
+
+
+# ADMINLEVEL
+#  ADMINLEVEL is similar to LOGLEVEL, it defines how much log detail
+#  is stored to be emailed periodically (see ADMIN_NOTIFY) to the
+#  EDDIE administrator (defined by ADMIN).  Set to 0 to disable.
+#  Use: ADMINLEVEL=<int 0-9>
+
+ADMINLEVEL=3
+
+
+# ADMIN_NOTIFY
+#  Specifies how often logs are emailed to ADMIN.
+#  Use: ADMIN_NOTIFY=<int>[smhdwcy]
+
+ADMIN_NOTIFY=1h         # Send Admin summaries once per hour
+
+
+# NUMTHREADS
+#  Define the maximum number of threads Boris should attempt to limit itself to
+#  using.  All directives are executed in their own thread so they do not hold
+#  up other directives scheduled for the same time.  A recommended minimum is
+#  about 5 (although there is no checking yet so be careful).  A good setting
+#  is probably 15 to 20.  
+
+NUMTHREADS=20
+
+
+# SCANPERIOD
+#  Defines the default scanperiod for every directive.  This is the amount of
+#  time a directive waits between executing.  This setting can be overridden
+#  when defining the directive.
+#  Use: SCANPERIOD=<int>[smhdwcy]
+
+SCANPERIOD=10m          # by default scan every 10 minutes
+
+
+# CONSOLE_PORT
+#  Defines the tcp port which the Boris Console Server thread listens on.
+#  This provides a read-only interface to the current state of all active
+#  directives within a running Boris.  The default port is 33343.
+#  Set to 0 to disable this feature.
+#  Use: CONSOLE_PORT=<int>
+#CONSOLE_PORT=0
+
+
+# EMAIL_FROM, EMAIL_REPLYTO
+#  Define the From: and Reply-To: fields used by the email action.
+#  If not set, default values will be used.
+#  Use: EMAIL_FROM='emailaddress'
+#       EMAIL_REPLYTO='emailaddress'
+
+#EMAIL_FROM='root@my.domain'
+#EMAIL_REPLYTO='sysadmins@my.domain'
+
+
+# SENDMAIL
+#  Define the location of the sendmail binary, which EDDIE uses to send
+#  all email.  This is usually either '/usr/lib/sendmail' (Solaris) or
+#  '/usr/sbin/sendmail' (Redhat Linux).  Defaults to '/usr/lib/sendmail'.
+#  If this option is set after the SMTP_SERVERS option, this will be used
+#  as the method to send email.
+#  This option cannot be used on Win32.
+#  Use: SENDMAIL='/path/to/sendmail'
+
+#SENDMAIL='/usr/sbin/sendmail'
+
+
+# SMTP_SERVERS
+#  Define one or more servers to make SMTP connections to for sending
+#  email.  Servers are specified by hostname or IP address, separated
+#  by commas.  The first server will be used, unless the connection
+#  fails, then each server will be attempted in turn.
+#  Defaults to 'localhost'.
+#  If this option is set after the SENDMAIL option, this will be used
+#  as the method to send email.
+#  This option must be used to send email on Win32.
+#  Use: SMTP_SERVERS='smtp0.domain.com,smtp1.domain.com'
+
+SMTP_SERVERS='localhost'
+
+
+# SPREADSERVER, SPREADPORT
+#  Specifies how to connect to a Spread server.
+#  These settings (and the use of Spread) are optional.
+#  Use: SPREADSERVER='<Spread server hostname or IP>'
+#       SPREADPORT=<Spread server port number>
+
+#SPREADSERVER='localhost'
+#SPREADPORT=4803
+
+
+# INTERPRETERS
+#  Defines processes which are "interpreters", where the first argument will be
+#  the real name of the process when examining the process table.  This only
+#  effects the PROC directive and means you can look for a process called
+#  "test.py" which looks like "/usr/bin/python /export/util/test.py" in the
+#  process table.  Boris is smart enough to ignore the first part,
+#  "/usr/bin/python" and treat the second part as the actual process name
+#  (which is normally what you want).
+#  Use: INTERPRETERS='<name>[,<name> ...]'
+
+INTERPRETERS='sh,bash,perl,python,python2.7,python3.5'
+
+
+# WORKDIR
+#  Defines a location where Boris can store temporary files.  This is used
+#  by various directives that need to save some information or state to
+#  the filesystem.  The directory can be safely removed when Boris is not
+#  running.  Boris does not clean up the directory itself (it may clean up
+#  some files before shutting down).  The whole directory tree will be
+#  created on startup if it doesn't already exist.
+
+WORKDIR="/var/tmp/borisworkdir"
+
+
+# RESCANCONFIGS
+#  Normally Boris will constantly check its config files for changes, and
+#  re-load them after stopping the threads.  This flag can turn off that
+#  behavior.  If it is set to 0/false/off, then you can still send Boris a
+#  HUP signal to have it reload the configs.
+
+#RESCANCONFIGS=false
+
+
+# INCLUDE
+#  Continue parsing the file named after INCLUDE.  This allows the
+#  configuration to be split into multiple files.  Boris rules and directives
+#  are usually defined in separate files to keep things tidy.
+#  Use: INCLUDE '<filename>'
+
+# These are provided as examples only.  Rules need to be customized for your
+# environment.  Use these as a guide for designing your own rules.
+INCLUDE 'rules/message.rules'        # common MSG definitions
+

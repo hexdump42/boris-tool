@@ -1,5 +1,5 @@
 import unittest
-import env
+from . import env
 
 import boristool.common.config as config
 import boristool.common.config

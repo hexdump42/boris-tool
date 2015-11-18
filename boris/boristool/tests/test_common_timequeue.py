@@ -1,6 +1,9 @@
 import unittest
-import env
-from queue import Empty
+from . import env
+try:
+    from queue import Empty
+except:
+    from Queue import Empty
 
 import boristool.common.timequeue as timequeue
 

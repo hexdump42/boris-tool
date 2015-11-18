@@ -1,5 +1,5 @@
 import unittest
-import env
+from . import env
 
 import boristool.common.log as log
 import boristool.common.utils as utils

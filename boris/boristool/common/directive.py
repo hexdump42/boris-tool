@@ -613,7 +613,7 @@ class Directive(object):
                     # Get the actions to execute from the given Level of the N object
                     afunc = Config.NDict[notif].levels[level]
                 except KeyError:
-                    log.log("<directive>Directive.performAction(): Error in directive.py line 431: Config.NDict[notif].levels[level], level=%s"
+                    log.log("<directive>Directive.performAction(): Config.NDict[notif].levels[level], level=%s"
                             % level, 5)
                 else:
                     self.Action.notif = notif

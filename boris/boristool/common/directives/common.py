@@ -428,7 +428,6 @@ class PORT(directive.Directive):
     """
 
     def __init__(self, toklist):
-        apply(directive.Directive.__init__, (self, toklist))
         super(PORT, self).__init__(toklist)
 
     def tokenparser(self, toklist, toktypes, indent):
